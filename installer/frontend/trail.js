@@ -65,7 +65,6 @@ const submitDefinitionPage = {
   path: '/define/submit',
   component: SubmitDefinition,
   title: 'Submit',
-  hidePager: true,
 };
 
 const successPage = {
@@ -217,6 +216,7 @@ export const sections = new Map([
     successPage,
   ]],
   ['bootDryRun', [
+    submitDefinitionPage,
     dryRunPage,
   ]],
 ]);
@@ -302,6 +302,7 @@ export class Trail {
    // Returns the previous page in the trail if that page exists
   previousFrom(page) {
     const myIx = this.ixByPage.get(page);
+    console.log("previousFrom", myIx, page);
     return this._pages[myIx - 1];
   }
 
