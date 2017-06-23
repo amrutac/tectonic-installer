@@ -12,13 +12,14 @@ export const SubmitDefinition = connect(
     ready: state.cluster.ready,
   }),
   dispatch => ({
-    onFinish: (dryRun=false) => dispatch(commitToServer(dryRun)),
+    onSubmit: () => dispatch(commitToServer(false)),
+    onDryRun: () => dispatch(commitToServer(true)),
   })
-)(({phase, response, ready, onFinish, navigatePrevious, navigateNext}) => {
+)(({phase, response, ready, onSubmit, onDryRun, navigatePrevious, navigateNext}) => {
   let feature =
     <div className="wiz-giant-button-container">
       <button className="btn btn-primary wiz-giant-button"
-              onClick={() => onFinish(false)}>
+              onClick={() => onSubmit(false)}>
         Submit
       </button>
     </div>;
@@ -77,7 +78,7 @@ export const SubmitDefinition = connect(
       {feature}
       <p>
         <b>Advanced mode: </b>
-        <a onClick={() => onFinish(true)} href="#">Manually boot</a> your own cluster. Validate configuration, generate assets, but don't create the cluster.
+        <a onClick={() => { onDryRun(); navigateNext(); }} href="#">Manually boot</a> your own cluster. Validate configuration, generate assets, but don't create the cluster.
       </p>
       <div className={errorClasses}>
         {errorMessage}

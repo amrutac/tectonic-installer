@@ -37,14 +37,17 @@ const NavSection = connect(state => ({state}))(
             const classes = classNames('wiz-wizard__nav__step', {
               'wiz-wizard__nav__step--active': page === currentPage,
             });
-            return (
-              <li className={classes} key={page.path}>
-                <button className='wiz-wizard__nav__link btn btn-link btn-link-ordinary'
-                        onClick={() => handlePage(page)}
-                        disabled={!navTrail.navigable(page) || !navTrail.canNavigateForward(currentPage, page, state)}
-                >{page.title}</button>
-              </li>
-            );
+            if (navTrail.showSectionLink(currentPage, page, state)) {
+              return (
+                <li className={classes} key={page.path}>
+                  <button className='wiz-wizard__nav__link btn btn-link btn-link-ordinary'
+                          onClick={() => handlePage(page)}
+                          disabled={!navTrail.navigable(page) || !navTrail.canNavigateForward(currentPage, page, state)}
+                  >{page.title}</button>
+                </li>
+              );
+            }
+            return null;
           })
         }
       </ul>
@@ -172,7 +175,6 @@ class extends React.Component {
                     trail.sections.bootBaremetal,
                     trail.sections.bootAWS,
                     trail.sections.bootAWSTF,
-                    trail.sections.bootDryRun,
                   ]}
                   currentPage={currentPage}
                   handlePage={nav} />

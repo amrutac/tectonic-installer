@@ -86,7 +86,7 @@ export const commitToServer = (dryRun=false, retry=false, opts={}) => (dispatch,
   setIn(DRY_RUN, dryRun, dispatch);
   setIn(RETRY, retry, dispatch);
 
-  const {COMMIT_REQUESTED, COMMIT_FAILED, COMMIT_SUCCESSFUL, COMMIT_SENT} = serverActionTypes;
+  const {COMMIT_REQUESTED, COMMIT_FAILED, COMMIT_SUCCESSFUL, COMMIT_DRYRUN_SUCCESSFUL, COMMIT_SENT} = serverActionTypes;
 
   dispatch({type: COMMIT_REQUESTED});
 
@@ -110,6 +110,9 @@ export const commitToServer = (dryRun=false, retry=false, opts={}) => (dispatch,
         observeClusterStatus(dispatch, getState);
         if (!observeInterval) {
           observeInterval = setInterval(() => observeClusterStatus(dispatch, getState), 10000);
+        }
+        if (dryRun) {
+          return dispatch({payload, type: COMMIT_DRYRUN_SUCCESSFUL});
         }
         return dispatch({payload, type: COMMIT_SUCCESSFUL});
       }) :

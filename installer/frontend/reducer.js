@@ -74,6 +74,13 @@ const reducersTogether = combineReducers({
         phase: commitPhases.SUCCEEDED,
         response: action.payload,
       };
+    case serverActionTypes.COMMIT_DRYRUN_SUCCESSFUL:
+      console.log('COMMIT_DRYRUN_SUCCESSFUL');
+      console.dir(action.payload);
+      return {
+        phase: commitPhases.DRYRUN_SUCCEEDED,
+        response: action.payload,
+      };
     case serverActionTypes.COMMIT_FAILED:
       console.log('COMMIT FAILED');
       console.dir(action.payload);

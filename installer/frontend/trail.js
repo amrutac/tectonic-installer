@@ -65,6 +65,7 @@ const submitDefinitionPage = {
   path: '/define/submit',
   component: SubmitDefinition,
   title: 'Submit',
+  hidePager: true,
 };
 
 const successPage = {
@@ -196,6 +197,7 @@ export const sections = new Map([
     bmSshKeysPage,
     usersPage,
     submitDefinitionPage,
+    dryRunPage,
   ]],
   ['defineAWS', [
     awsCloudCredentialsPage,
@@ -206,6 +208,7 @@ export const sections = new Map([
     awsVPCPage,
     usersPage,
     submitDefinitionPage,
+    dryRunPage,
   ]],
   ['bootBaremetalTF', [
     TFPowerOnPage,
@@ -214,10 +217,6 @@ export const sections = new Map([
   ['bootAWSTF', [
     TFPowerOnPage,
     successPage,
-  ]],
-  ['bootDryRun', [
-    submitDefinitionPage,
-    dryRunPage,
   ]],
 ]);
 
@@ -283,7 +282,6 @@ export class Trail {
     if (!_.isFinite(a) || !_.isFinite(b)) {
       return false;
     }
-
     const start = Math.min(a, b);
     const end = Math.max(a, b);
 
@@ -302,7 +300,6 @@ export class Trail {
    // Returns the previous page in the trail if that page exists
   previousFrom(page) {
     const myIx = this.ixByPage.get(page);
-    console.log("previousFrom", myIx, page);
     return this._pages[myIx - 1];
   }
 
@@ -310,6 +307,19 @@ export class Trail {
   nextFrom(page) {
     const myIx = this.ixByPage.get(page);
     return this._pages[myIx + 1];
+  }
+
+  showSectionLink(currentPage, page, state) {
+    if (currentPage.path === '/define/advanced') {
+      return true;
+    }
+
+    if (page.path === '/define/advanced') {
+      return currentPage.path === '/define/submit' && state.clusterConfig[DRY_RUN];
+    }
+    console.log(currentPage.path, page.path);
+
+    return true;
   }
 }
 
@@ -319,11 +329,13 @@ const platformToSection = {
   [AWS_TF]: {
     choose: new Trail([sections.choose, sections.defineAWS]),
     define: new Trail([sections.defineAWS], [submitDefinitionPage]),
+    dryRun: new Trail([sections.defineAWS], null, {canReset: true}),
     boot: new Trail([sections.bootAWSTF]),
   },
   [BARE_METAL_TF]: {
     choose: new Trail([sections.choose, sections.defineBaremetal]),
     define: new Trail([sections.defineBaremetal], [submitDefinitionPage]),
+    dryRun: new Trail([sections.defineBaremetal], null, {canReset: true}),
     boot: new Trail([sections.bootBaremetalTF]),
   },
 };
@@ -343,7 +355,11 @@ export const trail = ({cluster, clusterConfig, commitState}) => {
   const submitted = ready || (phase === commitPhases.SUCCEEDED);
   if (submitted) {
     if (clusterConfig[DRY_RUN]) {
-      return new Trail([sections.bootDryRun], null, {canReset: true});
+      return platformToSection[platform].dryRun;
+    }
+    //TODO: Test this
+    if (phase === commitPhases.IDLE) {
+      return platformToSection[platform].define;
     }
     return platformToSection[platform].boot;
   }
