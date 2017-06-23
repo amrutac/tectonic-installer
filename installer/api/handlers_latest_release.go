@@ -1,10 +1,7 @@
 package api
 
 import (
-	"fmt"
 	"io"
-	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -14,14 +11,7 @@ func latestReleaseHandler(w http.ResponseWriter, req *http.Request, _ *Context) 
 	if err != nil {
 		return newBadRequestError("Failed to get a response from coreos.com: %s", err)
 	}
-	responseData, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	responseString := string(responseData)
-	fmt.Fprintf(responseString)
 	io.Copy(w, res.Body)
-
 	res.Body.Close()
 	return nil
 }

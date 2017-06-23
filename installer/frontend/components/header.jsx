@@ -62,7 +62,6 @@ export class Header extends React.Component {
 
   componentDidMount() {
     fetchLatestRelease().then((release) => {
-      console.log('release', release);
       this.setState({ latestRelease: parseLatestVersion(release) });
     }).catch((err) => {
       console.error('Error retrieving latest version of tectonic ', err.message);

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 
 import { commitPhases } from '../actions';
 import { TectonicGA } from '../tectonic-ga';
-
+import { ResetButton } from './reset-button';
 export const DryRun = connect(
   state => ({
     phase: state.commitState.phase,
@@ -19,7 +19,7 @@ export const DryRun = connect(
   const errorClasses = classNames('wiz-error-message', {
     hidden: phase !== commitPhases.FAILED,
   });
-
+  console.log('navigated to dry-run');
   let content = <div className="form-group">
     Validate configuration, generate assets, but don't create the cluster using the 'Advanced Mode' on Submit (previous) page.
   </div>;
@@ -58,6 +58,7 @@ export const DryRun = connect(
   return <div className="row">
     <div className="col-xs-12">
       {content}
+      <ResetButton />
       <div className={errorClasses}>
         {errorMessage}
       </div>

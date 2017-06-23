@@ -309,7 +309,10 @@ export class Trail {
     return this._pages[myIx + 1];
   }
 
+  //Determins if section link is visible
+  //Currently has logic to show the Download assets link in Definition Section
   showSectionLink(currentPage, page, state) {
+    //Current page is for Downloading assets
     if (currentPage.path === '/define/advanced') {
       return true;
     }
@@ -317,8 +320,6 @@ export class Trail {
     if (page.path === '/define/advanced') {
       return currentPage.path === '/define/submit' && state.clusterConfig[DRY_RUN];
     }
-    console.log(currentPage.path, page.path);
-
     return true;
   }
 }
@@ -329,13 +330,13 @@ const platformToSection = {
   [AWS_TF]: {
     choose: new Trail([sections.choose, sections.defineAWS]),
     define: new Trail([sections.defineAWS], [submitDefinitionPage]),
-    dryRun: new Trail([sections.defineAWS], null, {canReset: true}),
+    dryRun: new Trail([sections.defineAWS], null),
     boot: new Trail([sections.bootAWSTF]),
   },
   [BARE_METAL_TF]: {
     choose: new Trail([sections.choose, sections.defineBaremetal]),
     define: new Trail([sections.defineBaremetal], [submitDefinitionPage]),
-    dryRun: new Trail([sections.defineBaremetal], null, {canReset: true}),
+    dryRun: new Trail([sections.defineBaremetal], null),
     boot: new Trail([sections.bootBaremetalTF]),
   },
 };
@@ -352,7 +353,8 @@ export const trail = ({cluster, clusterConfig, commitState}) => {
   }
 
   const { phase } = commitState;
-  const submitted = ready || (phase === commitPhases.SUCCEEDED);
+  const submitted = ready || (phase === commitPhases.SUCCEEDED) || (phase === commitPhases.DRYRUN_SUCCEEDED);
+  console.log('phase and submitted', phase, submitted);
   if (submitted) {
     if (clusterConfig[DRY_RUN]) {
       return platformToSection[platform].dryRun;
