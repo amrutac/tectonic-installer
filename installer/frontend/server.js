@@ -85,8 +85,10 @@ let observeInterval;
 export const commitToServer = (dryRun=false, retry=false, opts={}) => (dispatch, getState) => {
   setIn(DRY_RUN, dryRun, dispatch);
   setIn(RETRY, retry, dispatch);
-
   const {COMMIT_REQUESTED, COMMIT_FAILED, COMMIT_SUCCESSFUL, COMMIT_DRYRUN_SUCCESSFUL, COMMIT_SENT} = serverActionTypes;
+  // if (dryRun) {
+  //   dispatch({payload: null, type: COMMIT_DRYRUN_SUCCESSFUL});
+  // }
 
   dispatch({type: COMMIT_REQUESTED});
 
