@@ -354,9 +354,10 @@ export const trail = ({cluster, clusterConfig, commitState}) => {
 
   const { phase } = commitState;
   const submitted = ready || (phase === commitPhases.SUCCEEDED) || (phase === commitPhases.DRYRUN_SUCCEEDED);
-  console.log('phase and submitted', phase, submitted);
+
   if (submitted) {
-    if (clusterConfig[DRY_RUN]) {
+    console.log(ready);
+    if (clusterConfig[DRY_RUN] && commitPhases.DRYRUN_SUCCEEDED && ready) {
       return platformToSection[platform].dryRun;
     }
     //TODO: Test this

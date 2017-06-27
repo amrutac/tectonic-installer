@@ -5,7 +5,10 @@ import { connect } from 'react-redux';
 import { commitToServer } from '../server';
 import { commitPhases } from '../actions';
 
-const stateToProps = ({phase, response, ready}) => {
+const stateToProps = ({commitState, cluster}) => {
+  const phase = commitState.phase;
+  const response = commitState.response;
+  const ready = cluster.ready;
   return {
     phase,
     response,
@@ -20,20 +23,17 @@ const dispatchToProps = dispatch => ({
 
 export const SubmitDefinition = connect(stateToProps, dispatchToProps)(
 class SubmitDefinitionComponent extends React.Component {
-  componentWillUpdate(nextProps) {
-    console.log('this.props.phase', nextProps);
-    if (this.props.phase === commitPhases.DRYRUN_SUCCEEDED) {
+  shouldComponentUpdate(nextProps) {
+    console.log('shouldComponentUpdate nextProps', nextProps.phase);
+    if (nextProps && nextProps.phase === commitPhases.DRYRUN_SUCCEEDED && nextProps.ready) {
       this.props.navigateNext();
     }
-  }
-
-  shouldComponentUpdate(nextProps){
-    console.log('nextProps', nextProps);
     return true;
   }
 
   render () {
     const {phase, response, ready, onSubmit, onDryRun, navigatePrevious, navigateNext} = this.props;
+
     let feature =
     <div className="wiz-giant-button-container">
       <button className="btn btn-primary wiz-giant-button"
