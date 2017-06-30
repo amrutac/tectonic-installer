@@ -24,8 +24,9 @@ const dispatchToProps = dispatch => ({
 export const SubmitDefinition = connect(stateToProps, dispatchToProps)(
 class SubmitDefinitionComponent extends React.Component {
   shouldComponentUpdate(nextProps) {
-    console.log('shouldComponentUpdate nextProps', nextProps.phase);
+    console.log('shouldComponentUpdate for SubmitDefinitionComponent');
     if (nextProps && nextProps.phase === commitPhases.DRYRUN_SUCCEEDED && nextProps.ready) {
+      console.log('navigateNext from submit definition');
       this.props.navigateNext();
     }
     return true;
