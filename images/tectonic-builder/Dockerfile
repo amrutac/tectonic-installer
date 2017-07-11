@@ -19,8 +19,12 @@ RUN go get github.com/jstemmer/go-junit-report
 ### License parser
 RUN go get github.com/coreos/license-bill-of-materials
 
-### Install Terraform, NodeJS and Yarn
-ENV TERRAFORM_VERSION="0.9.6"
+# /go needs to be writable by jenkins user like it is in the upstream golang image
+RUN chmod 777 -R /go
+
+### Install Shellcheck, Terraform, NodeJS and Yarn
+ENV SHELLCHECK_VERSION="v0.4.6"
+ENV TERRAFORM_VERSION="v0.9.11-coreos.2"
 ENV NODE_VERSION="v8.1.2"
 ENV YARN_VERSION="v0.24.6"
 # yarn needs a home writable by any user running the container
@@ -30,11 +34,11 @@ RUN chmod 777 -R ${HOME}
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y -q \
-    build-essential sudo curl wget git autoconf automake unzip libtool jq shellcheck awscli gnupg1 \
+    build-essential sudo curl wget git autoconf automake unzip libtool jq awscli gnupg1 \
     openvpn xvfb xauth
 
 # Install Terraform
-RUN curl https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip | funzip > /usr/local/bin/terraform && chmod +x /usr/local/bin/terraform
+RUN curl -L https://github.com/coreos/terraform/releases/download/${TERRAFORM_VERSION}/linux_amd64.zip | funzip > /usr/local/bin/terraform && chmod +x /usr/local/bin/terraform
 
 # Install NodeJS
 RUN cd /tmp && \
@@ -55,6 +59,12 @@ RUN cd /tmp && \
     rm -f /tmp/yarn.tar.gz && \
     mv /tmp/dist /usr/local/yarn && \
     ln -s /usr/local/yarn/bin/yarn /usr/local/bin/yarn
+
+# Install Shellcheck
+RUN cd /tmp && \
+    wget --quiet https://storage.googleapis.com/shellcheck/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz && \
+    tar xJf shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz && \
+    mv /tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck /usr/local/bin/shellcheck
 
 # Install Chrome for installer gui tests
 # Use Chrome beta because v60 or higher is needed for headless mode
